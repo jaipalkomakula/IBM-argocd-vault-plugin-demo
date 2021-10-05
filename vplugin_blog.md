@@ -109,6 +109,8 @@ Note that you will need to create the SA in the namespace that you will install 
     ttl=24h
 ```
 
+NOTE: Namespace "vplugindemo" is argocd instace.  
+
 **Create a service account**
 ```
 ---
@@ -212,6 +214,8 @@ stringData:
 
 With Vault installed and ArgoCD installed and a secret manifest in Git, we next build an application in ArgoCD and provide our plugin values via environment variables: In the end, this will look like the example below,  which points to our Git Repo which houses a sample secret. It is important to note that the environment variables are prefixed with AVP, this is a requirement of the plugin when using environment variables.
 
+
+
 ```
 project: default
 source:
@@ -226,13 +230,28 @@ source:
       - name: AVP_TYPE
         value: vault
       - name: AVP_VAULT_ADDR
-        value: 'http://172.30.189.194:8200'
+        value: 'http://172.30.132.190:8200'
       - name: AVP_AUTH_TYPE
         value: k8s
 destination:
   server: 'https://kubernetes.default.svc'
+  namespace: vplugin-demo
 syncPolicy: {}
 ```
+
+Note: The IP "172.30.132.190" is for the vault service
+
+```
+
+% oc project hashicorp-vault
+Now using project "hashicorp-vault" on server "https://api.vivaocp.comcast.net:6443".
+ % oc get service
+NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+vault                      ClusterIP   172.30.132.190   <none>        8200/TCP,8201/TCP   11m
+vault-agent-injector-svc   ClusterIP   172.30.32.183    <none>        443/TCP             11m
+vault-internal             ClusterIP   None             <none>        8200/TCP,8201/TCP   11m
+```
+
 
 Upon successful sync of your ArgoCD, you will see the secret in ArgoCD!
 
